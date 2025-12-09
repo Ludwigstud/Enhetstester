@@ -9,17 +9,28 @@ describe("Booking View", () => {
 	// ----------------------------------------------------------------------------
 
 	it("should show error message if fields are missing or invalid", async () => {
-		// SYFTE: Testa validering av obligatoriska fält.
+		// SYFTE: Testa validering av obligatoriska fält (User Story 1).
 		// NIVÅ: VG
-		// UPPFYLLER ACCEPTANSKRITERIUM (User Story 1):
-		// "VG - Ifall användaren inte fyller i något av ovanstående så ska ett felmeddelande visas"
+		// UPPFYLLER: "Testet kollar att felmeddelandet visas för flera kombinationer av vad man glömt att fylla i."
 
 		render(<App />);
 
-		// Action: Jag försöker klicka på "Boka" utan att ha fyllt i datum, tid eller antal spelare.
+		// SCENARIO 1: Användaren fyller inte i något alls.
+		fireEvent.click(screen.getByText("strIIIIIike!"));
+		expect(screen.getByText("Alla fälten måste vara ifyllda")).toBeInTheDocument();
+
+		// SCENARIO 2: Användaren fyller i Datum och Tid, men glömmer Antal spelare och Banor.
+		// Vi vill se att SAMMA felmeddelande fortfarande visas/ligger kvar.
+		const dateInput = screen.getByLabelText(/Date/i);
+		const timeInput = screen.getByLabelText(/Time/i);
+
+		fireEvent.change(dateInput, { target: { value: "2023-12-24" } });
+		fireEvent.change(timeInput, { target: { value: "18:00" } });
+
+		// Klickar igen
 		fireEvent.click(screen.getByText("strIIIIIike!"));
 
-		// Assert: Jag verifierar att felmeddelandet visas korrekt.
+		// Felet ska fortfarande vara där
 		expect(screen.getByText("Alla fälten måste vara ifyllda")).toBeInTheDocument();
 	});
 
