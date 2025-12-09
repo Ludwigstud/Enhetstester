@@ -93,6 +93,32 @@ describe("Booking View", () => {
 		expect(screen.getByText("Det får max vara 4 spelare per bana")).toBeInTheDocument();
 	});
 
+	it("should show error message if shoe sizes are not filled", async () => {
+		// SYFTE: Testa att man inte kan boka med tomma skofält.
+		// NIVÅ: VG
+		// UPPFYLLER: "VG - Om användaren försöker slutföra bokningen utan att ange skostorlek..."
+
+		render(<App />);
+
+		// 1. Fyll i all grundinfo korrekt
+		fireEvent.change(screen.getByLabelText(/Date/i), { target: { value: "2023-12-24" } });
+		fireEvent.change(screen.getByLabelText(/Time/i), { target: { value: "18:00" } });
+		fireEvent.change(screen.getByLabelText(/Number of awesome bowlers/i), {
+			target: { value: "1" },
+		});
+		fireEvent.change(screen.getByLabelText(/Number of lanes/i), { target: { value: "1" } });
+
+		// 2. Lägg till en sko (men skriv INGET i storleksrutan)
+		fireEvent.click(screen.getByText("+"));
+		// Vi lämnar input-fältet tomt.
+
+		// 3. Försök boka
+		fireEvent.click(screen.getByText("strIIIIIike!"));
+
+		// 4. Verifiera felmeddelandet
+		expect(screen.getByText("Alla skor måste vara ifyllda")).toBeInTheDocument();
+	});
+
 	// ----------------------------------------------------------------------------
 	// TESTER FÖR GODKÄNT (G) - FUNKTIONALITET
 	// Dessa tester verifierar "Happy Path" och grundläggande interaktion.
