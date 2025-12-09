@@ -7,30 +7,71 @@ describe("Booking View", () => {
 	// TESTER FÖR VÄL GODKÄNT (VG) - FELHANTERING
 	// Dessa tester verifierar att specifika felmeddelanden visas vid felaktig inmatning.
 	// ----------------------------------------------------------------------------
-
-	it("should show error message if fields are missing or invalid", async () => {
-		// SYFTE: Testa validering av obligatoriska fält (User Story 1).
-		// NIVÅ: VG
-		// UPPFYLLER: "Testet kollar att felmeddelandet visas för flera kombinationer av vad man glömt att fylla i."
-
+	it("should show error message if Date is missing", async () => {
 		render(<App />);
 
-		// SCENARIO 1: Användaren fyller inte i något alls.
+		// Vi fyller i allt UTOM datum
+		fireEvent.change(screen.getByLabelText(/Time/i), { target: { value: "18:00" } });
+		fireEvent.change(screen.getByLabelText(/Number of awesome bowlers/i), {
+			target: { value: "1" },
+		});
+		fireEvent.change(screen.getByLabelText(/Number of lanes/i), { target: { value: "1" } });
+
+		// Klicka boka
 		fireEvent.click(screen.getByText("strIIIIIike!"));
+
+		// Felet ska visas
 		expect(screen.getByText("Alla fälten måste vara ifyllda")).toBeInTheDocument();
+	});
 
-		// SCENARIO 2: Användaren fyller i Datum och Tid, men glömmer Antal spelare och Banor.
-		// Vi vill se att SAMMA felmeddelande fortfarande visas/ligger kvar.
-		const dateInput = screen.getByLabelText(/Date/i);
-		const timeInput = screen.getByLabelText(/Time/i);
+	it("should show error message if Time is missing", async () => {
+		render(<App />);
 
-		fireEvent.change(dateInput, { target: { value: "2023-12-24" } });
-		fireEvent.change(timeInput, { target: { value: "18:00" } });
+		// Vi fyller i allt UTOM tid
+		fireEvent.change(screen.getByLabelText(/Date/i), { target: { value: "2023-12-24" } });
+		fireEvent.change(screen.getByLabelText(/Number of awesome bowlers/i), {
+			target: { value: "1" },
+		});
+		fireEvent.change(screen.getByLabelText(/Number of lanes/i), { target: { value: "1" } });
 
-		// Klickar igen
 		fireEvent.click(screen.getByText("strIIIIIike!"));
 
-		// Felet ska fortfarande vara där
+		expect(screen.getByText("Alla fälten måste vara ifyllda")).toBeInTheDocument();
+	});
+
+	it("should show error message if Number of People is 0", async () => {
+		render(<App />);
+
+		// Vi fyller i allt, men sätter spelare till 0 (eller låter bli att ändra det om default är 0)
+		fireEvent.change(screen.getByLabelText(/Date/i), { target: { value: "2023-12-24" } });
+		fireEvent.change(screen.getByLabelText(/Time/i), { target: { value: "18:00" } });
+		fireEvent.change(screen.getByLabelText(/Number of lanes/i), { target: { value: "1" } });
+
+		// Explicit sätta till 0 för tydlighetens skull
+		fireEvent.change(screen.getByLabelText(/Number of awesome bowlers/i), {
+			target: { value: "0" },
+		});
+
+		fireEvent.click(screen.getByText("strIIIIIike!"));
+
+		expect(screen.getByText("Alla fälten måste vara ifyllda")).toBeInTheDocument();
+	});
+
+	it("should show error message if Number of Lanes is 0", async () => {
+		render(<App />);
+
+		// Vi fyller i allt, men sätter banor till 0
+		fireEvent.change(screen.getByLabelText(/Date/i), { target: { value: "2023-12-24" } });
+		fireEvent.change(screen.getByLabelText(/Time/i), { target: { value: "18:00" } });
+		fireEvent.change(screen.getByLabelText(/Number of awesome bowlers/i), {
+			target: { value: "1" },
+		});
+
+		// Explicit sätta till 0
+		fireEvent.change(screen.getByLabelText(/Number of lanes/i), { target: { value: "0" } });
+
+		fireEvent.click(screen.getByText("strIIIIIike!"));
+
 		expect(screen.getByText("Alla fälten måste vara ifyllda")).toBeInTheDocument();
 	});
 
