@@ -17,6 +17,7 @@ function Confirmation() {
 			<Top title="See you soon!" />
 			{state || confirmation ? (
 				<form className="confirmation__details">
+					{/* La till "name" prop för inputs så att lättare länka samman för tester*/}
 					<Input
 						label="When"
 						type="text"
